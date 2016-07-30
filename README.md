@@ -5,3 +5,7 @@ An Android app to test for the default password vulnerability in Cisco routers p
 This is for educational and research purpose only! Connecting to someone's network without prior authorization is illegal (in most countries).
 
 The app is in a very early stage of development, so feel free to contribute.
+
+# Useful links during development:
+
+* Using an ArrayAdapter with ListView https://github.com/codepath/android_guides/wiki/Using-an-ArrayAdapter-with-ListView

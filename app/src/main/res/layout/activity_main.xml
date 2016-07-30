@@ -18,16 +18,10 @@
         android:text="Scan WiFi Networks"
         android:id="@+id/scanWifi" />
 
-    <TextView
-        android:text="Hello World, hahah!"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/mainText"/>
-
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/listView"
+        android:id="@+id/lvWifiNetworks"
         android:layout_gravity="center_horizontal" />
 
 </LinearLayout>
