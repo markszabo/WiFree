@@ -9,3 +9,4 @@ The app is in a very early stage of development, so feel free to contribute.
 # Useful links during development:
 
 * Using an ArrayAdapter with ListView https://github.com/codepath/android_guides/wiki/Using-an-ArrayAdapter-with-ListView
+* Database for storage https://developer.android.com/training/basics/data-storage/databases.html 

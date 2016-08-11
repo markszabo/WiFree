@@ -12,28 +12,27 @@
     android:orientation="vertical"
     android:gravity="center_horizontal">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Crack List"
+        android:id="@+id/tvCrackListTitle"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start crack service in the background"
-        android:id="@+id/startCrackService" />
+        android:text="Clear Crack List"
+        android:id="@+id/clearCrackList" />
 
-    <Button
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Go to crack list"
-        android:id="@+id/goToCrackList" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Scan WiFi Networks"
-        android:id="@+id/scanWifi" />
-
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/lvWifiNetworks"
-        android:layout_gravity="center_horizontal" />
-
+        android:text="T"
+        android:id="@+id/tvSSIDS"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 </LinearLayout>

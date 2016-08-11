@@ -1,9 +1,11 @@
 package com.github.markszabo.wifree;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.support.v7.app.AppCompatActivity;
@@ -19,25 +21,49 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private WifiManager mWifiManager;
-    private boolean firstScan = true;
+    private boolean WifiScanReceiverRegistered = false;
 
     private ArrayList<WifiNetwork> arrayOfNetworks;
     private WifiNetworkAdapter adapter;
+    private CrackListDbHelper mDbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if(mDbHelper == null) {
+            mDbHelper = new CrackListDbHelper(getApplicationContext()); //create the database
+            Toast.makeText(getApplicationContext(), "Database available", Toast.LENGTH_SHORT).show();
+        }
+
         Button scanBtn = (Button) findViewById(R.id.scanWifi);
         scanBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if(firstScan) {
+                if(!WifiScanReceiverRegistered) {
                     mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
                     registerReceiver(mWifiScanReceiver,
                             new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
                 }
+                WifiScanReceiverRegistered = true;
                 mWifiManager.startScan();
+            }
+        });
+
+        Button goCrackListBtn = (Button) findViewById(R.id.goToCrackList);
+        goCrackListBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent myIntent = new Intent(MainActivity.this, CrackList.class);
+                MainActivity.this.
+
+                startActivity(myIntent);
+            }
+        });
+
+        Button startCrackService = (Button) findViewById(R.id.startCrackService);
+        startCrackService.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                CrackService.startCrackService(MainActivity.this);
             }
         });
 
@@ -53,9 +79,32 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 WifiNetwork network = (WifiNetwork) parent.getItemAtPosition(position);
-                Toast.makeText(getApplicationContext(), network.SSID, Toast.LENGTH_SHORT).show();
+
+                //get the database
+                SQLiteDatabase db = mDbHelper.getWritableDatabase();
+                //create new record
+                ContentValues values = new ContentValues();
+                values.put(CrackListContract.FeedEntry.COLUMN_NAME_SSID, network.SSID);
+                values.put(CrackListContract.FeedEntry.COLUMN_NAME_BSSID, network.BSSID);
+                values.put(CrackListContract.FeedEntry.COLUMN_NAME_SERIAL_NUMBER, 200000000); //start serial number from cisco_psk.py
+                values.put(CrackListContract.FeedEntry.COLUMN_NAME_POSSIBLE_PASSWORD, "");
+                //insert record
+                db.insert(
+                        CrackListContract.FeedEntry.TABLE_NAME,
+                        null, //no field can be null
+                        values);
+
+                Toast.makeText(getApplicationContext(), network.SSID + " added to the cracklist", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        if(WifiScanReceiverRegistered) {
+            unregisterReceiver(mWifiScanReceiver);
+        }
     }
 
     private final BroadcastReceiver mWifiScanReceiver = new BroadcastReceiver() {
