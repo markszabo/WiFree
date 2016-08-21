@@ -1,33 +1,22 @@
 package com.github.markszabo.wifree;
 
-import android.app.Application;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
-public class CrackList extends AppCompatActivity {
-    private CrackListDbHelper mDbHelper;
-    private SQLiteDatabase db;
+public final class CrackList {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_crack_list);
+    public static WifiNetwork[] getListFromDb(Context context){
+        CrackListDbHelper mDbHelper = new CrackListDbHelper(context); //create the database
 
-        if(mDbHelper == null) {
-            mDbHelper = new CrackListDbHelper(getApplicationContext()); //create the database
-            Toast.makeText(getApplicationContext(), "Database available", Toast.LENGTH_SHORT).show();
-        }
-
-        db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
         String[] projection = {
                 CrackListContract.FeedEntry._ID,
-                CrackListContract.FeedEntry.COLUMN_NAME_SSID
+                CrackListContract.FeedEntry.COLUMN_NAME_SSID,
+                CrackListContract.FeedEntry.COLUMN_NAME_BSSID,
+                CrackListContract.FeedEntry.COLUMN_NAME_SERIAL_NUMBER,
+                CrackListContract.FeedEntry.COLUMN_NAME_POSSIBLE_PASSWORD
         };
         String sortOrder =
                 CrackListContract.FeedEntry._ID + " ASC";
@@ -41,23 +30,27 @@ public class CrackList extends AppCompatActivity {
                 sortOrder                                 // The sort order
         );
         c.moveToFirst();
-        String ssids = "";
+        WifiNetwork[] ret = new WifiNetwork[c.getCount()];
         while(!c.isAfterLast()){
-            ssids += c.getString(c.getColumnIndexOrThrow(CrackListContract.FeedEntry.COLUMN_NAME_SSID)) + "\n";
+            ret[c.getPosition()] =
+                    new WifiNetwork(c.getString(c.getColumnIndexOrThrow(CrackListContract.FeedEntry.COLUMN_NAME_SSID)),
+                            c.getString(c.getColumnIndexOrThrow(CrackListContract.FeedEntry.COLUMN_NAME_BSSID)),
+                            c.getInt(c.getColumnIndexOrThrow(CrackListContract.FeedEntry.COLUMN_NAME_SERIAL_NUMBER)),
+                            c.getString(c.getColumnIndexOrThrow(CrackListContract.FeedEntry.COLUMN_NAME_POSSIBLE_PASSWORD)).split(";"));
             c.moveToNext();
         }
-        TextView tvSSIDS = (TextView) findViewById(R.id.tvSSIDS);
-        tvSSIDS.setText(ssids);
+        return ret;
+    }
 
-        Button clearCrackList = (Button) findViewById(R.id.clearCrackList);
-        clearCrackList.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                db.delete(CrackListContract.FeedEntry.TABLE_NAME, null, null);
-                //reload the activity to clear the list
-                finish();
-                startActivity(getIntent());
-            }
-        });
+    public static void updateListInDb(Context context, String BSSID, int serialNumber, String possiblePasswords) {
+        CrackListDbHelper mDbHelper = new CrackListDbHelper(context);
+
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        String sql = "UPDATE " + CrackListContract.FeedEntry.TABLE_NAME +
+                " SET " + CrackListContract.FeedEntry.COLUMN_NAME_SERIAL_NUMBER + "=" + String.valueOf(serialNumber) + ", " +
+                CrackListContract.FeedEntry.COLUMN_NAME_POSSIBLE_PASSWORD + "=\"" + possiblePasswords +
+                "\" WHERE " + CrackListContract.FeedEntry.COLUMN_NAME_BSSID + "=\"" + BSSID + "\"";
+        Toast.makeText(context, sql, Toast.LENGTH_SHORT).show();
+        db.execSQL(sql);
     }
 }

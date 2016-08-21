@@ -25,7 +25,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".CrackList">
+        <activity android:name=".CrackListActivity">
             android:parentActivityName="com.github.markszabo.wifree.MainActivity" >
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data

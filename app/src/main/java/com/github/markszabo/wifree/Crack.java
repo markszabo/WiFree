@@ -11,11 +11,15 @@ public class Crack {
 
     public Crack(String SSID, String BSSID){
         this.SSID = SSID;
-        this.BSSID = BSSID;
+        this.BSSID = BSSID.toLowerCase();
     }
 
     public int getVal(byte v0) {
-        return ((((v0 << 1) + v0) << 3)+ v0) >> 6;
+        int ret = ((((v0 << 1) + v0) << 3)+ v0) >> 6;
+        while(ret < 0) {
+            ret += 100;
+        }
+        return ret;
     }
 
     public int getVal(String v0) {
@@ -42,8 +46,26 @@ public class Crack {
 
         String ssid = String.format("%02d%02d%02d",getVal(m[0]),getVal(m[1]),getVal(m[2]));
 
-        String[] ret = new String[]{ssid, ""};
-        return ret;
+        String psk = "";
+
+        for(int i=0; i<8; i++) {
+            byte v0 = m[3+i];
+            int newchar = (0x41 + (((((v0<<1)+v0)<<2)+v0)>>7));
+            if(newchar < (int)'A') {
+                newchar += 26;
+            }
+            psk += (char) newchar;
+        }
+
+        return new String[]{ssid, psk};
     }
 
+    public String getPSK(int serial) {
+        String[] SSID_PSK = genSSID_PSK(this.BSSID, serial);
+        //if(SSID_PSK[0] == this.SSID) {
+            return SSID_PSK[1];
+        /*} else {
+            return null;
+        }*/
+    }
 }

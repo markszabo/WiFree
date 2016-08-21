@@ -22,7 +22,7 @@ public class CrackListDbHelper extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "CrackList.db";
+    public static final String DATABASE_NAME = "CrackListActivity.db";
 
     public CrackListDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         Button goCrackListBtn = (Button) findViewById(R.id.goToCrackList);
         goCrackListBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent myIntent = new Intent(MainActivity.this, CrackList.class);
+                Intent myIntent = new Intent(MainActivity.this, CrackListActivity.class);
                 MainActivity.this.
 
                 startActivity(myIntent);
@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
                 values.put(CrackListContract.FeedEntry.COLUMN_NAME_SSID, network.SSID);
                 values.put(CrackListContract.FeedEntry.COLUMN_NAME_BSSID, network.BSSID);
                 values.put(CrackListContract.FeedEntry.COLUMN_NAME_SERIAL_NUMBER, 200000000); //start serial number from cisco_psk.py
-                values.put(CrackListContract.FeedEntry.COLUMN_NAME_POSSIBLE_PASSWORD, "");
+                values.put(CrackListContract.FeedEntry.COLUMN_NAME_POSSIBLE_PASSWORD, "nulladik;elso;masodik");
                 //insert record
                 db.insert(
                         CrackListContract.FeedEntry.TABLE_NAME,

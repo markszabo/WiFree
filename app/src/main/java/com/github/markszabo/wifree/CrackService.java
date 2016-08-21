@@ -35,7 +35,7 @@ public class CrackService extends IntentService {
             // prepare intent which is triggered if the
             // notification is selected
 
-            Intent intent = new Intent(this, CrackList.class);
+            Intent intent = new Intent(this, CrackListActivity.class);
             PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
             // build notification
