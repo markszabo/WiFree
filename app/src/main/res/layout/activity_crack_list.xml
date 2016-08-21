@@ -27,6 +27,12 @@
         android:text="Clear Crack List"
         android:id="@+id/clearCrackList" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add test network to the list"
+        android:id="@+id/addTestToCrackList" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

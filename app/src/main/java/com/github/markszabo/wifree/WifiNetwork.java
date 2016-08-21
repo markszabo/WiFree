@@ -2,14 +2,15 @@ package com.github.markszabo.wifree;
 
 
 import java.util.Arrays;
+import java.util.List;
 
 public class WifiNetwork {
     public String SSID;
     public String BSSID;
     public int serialNumber;
-    public String[] possiblePasswords;
+    public List<String> possiblePasswords;
 
-    public WifiNetwork(String SSID, String BSSID, int serialNumber, String[] possiblePasswords){
+    public WifiNetwork(String SSID, String BSSID, int serialNumber, List<String> possiblePasswords){
         this.SSID = SSID;
         this.BSSID = BSSID;
         this.serialNumber = serialNumber;
@@ -22,7 +23,7 @@ public class WifiNetwork {
     }
 
         public String getVulnerabilityMessage(){
-        //Test if SSID sttarts with UPC
+        //Test if SSID starts with UPC
         if(!this.SSID.startsWith("UPC")) {
             return "Not vulnerable, since SSID does not start with UPC";
         }
@@ -37,5 +38,14 @@ public class WifiNetwork {
         }
         */
         return "Possibly vulnerable, tap to add to crack list.";
+    }
+
+    public String getPossiblePasswordsAsString(){
+        StringBuilder sb = new StringBuilder();
+        for (String s : possiblePasswords) {
+            sb.append(s);
+            sb.append(";");
+        }
+        return sb.toString();
     }
 }

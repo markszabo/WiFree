@@ -11,9 +11,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class CrackListActivity extends AppCompatActivity {
-    private CrackListDbHelper mDbHelper;
-    private SQLiteDatabase db;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,7 +20,7 @@ public class CrackListActivity extends AppCompatActivity {
 
         String ssids = "";
         for(int i=0; i < crackList.length; i++) {
-            ssids += crackList[i].SSID + " - " + crackList[i].BSSID + " + " + crackList[i].possiblePasswords[0] + " + " + crackList[i].possiblePasswords[2] + "\n";
+            ssids += crackList[i].SSID + " - " + crackList[i].BSSID + " + " + crackList[i].getPossiblePasswordsAsString() + "\n";
         }
 
         TextView tvSSIDS = (TextView) findViewById(R.id.tvSSIDS);
@@ -33,10 +30,21 @@ public class CrackListActivity extends AppCompatActivity {
         clearCrackList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                CrackListDbHelper mDbHelper = new CrackListDbHelper(getApplicationContext()); //create the database
+
+                SQLiteDatabase db = mDbHelper.getReadableDatabase();
                 db.delete(CrackListContract.FeedEntry.TABLE_NAME, null, null);
                 //reload the activity to clear the list
                 finish();
                 startActivity(getIntent());
+            }
+        });
+
+        Button addTestNetwork = (Button) findViewById(R.id.addTestToCrackList);
+        addTestNetwork.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CrackList.addToListInDb(getApplicationContext(), new WifiNetwork("538420", "e4:48:c7:88:7f:58"));
             }
         });
     }

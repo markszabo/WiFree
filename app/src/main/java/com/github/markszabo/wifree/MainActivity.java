@@ -79,21 +79,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 WifiNetwork network = (WifiNetwork) parent.getItemAtPosition(position);
-
-                //get the database
-                SQLiteDatabase db = mDbHelper.getWritableDatabase();
-                //create new record
-                ContentValues values = new ContentValues();
-                values.put(CrackListContract.FeedEntry.COLUMN_NAME_SSID, network.SSID);
-                values.put(CrackListContract.FeedEntry.COLUMN_NAME_BSSID, network.BSSID);
-                values.put(CrackListContract.FeedEntry.COLUMN_NAME_SERIAL_NUMBER, 200000000); //start serial number from cisco_psk.py
-                values.put(CrackListContract.FeedEntry.COLUMN_NAME_POSSIBLE_PASSWORD, "nulladik;elso;masodik");
-                //insert record
-                db.insert(
-                        CrackListContract.FeedEntry.TABLE_NAME,
-                        null, //no field can be null
-                        values);
-
+                CrackList.addToListInDb(getApplicationContext(), network);
                 Toast.makeText(getApplicationContext(), network.SSID + " added to the cracklist", Toast.LENGTH_SHORT).show();
             }
         });

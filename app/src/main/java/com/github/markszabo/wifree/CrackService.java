@@ -32,20 +32,29 @@ public class CrackService extends IntentService {
     }
 
     private void runCrack() {
-        makeNotification("Crack started", "for SSID", 0, true);
-
-            for(int i=0; i<1000000000; i++){
-                int a = i+1;
-                int b = a+i;
-                int c = b+a%123;
-                if(i%10000000 == 0) {
-                    makeNotification("Crack in progress", String.valueOf(i/10000000) + "%", i/10000000, true);
+        WifiNetwork[] networks = CrackList.getListFromDb(getApplicationContext());
+        for(int i=0; i<networks.length; i++) {
+            WifiNetwork net = networks[i];
+            makeNotification(i, "Crack started", "for SSID " + net.SSID, 0, true);
+            Crack c = new Crack(net.SSID, net.BSSID);
+            for(int sn=net.serialNumber; sn < 260000000; sn++) { //serialnumber goes from 200.000.000 to 260.000.000 according to cisco_psk.py
+                String PSK = c.getPSK(sn);
+                if(PSK != null) {
+                    net.possiblePasswords.add(PSK);
+                }
+                if((sn-200000000)%6000 == 0) {
+                    //TODO print the progress % better! (nicer code and also start with 0.01% and not 0.1% as now
+                    makeNotification(i, "Crack in progress", (sn-200000000)/600000 + "." + (sn-200000000)/6000%100 + "%", (sn-200000000)/600000, true);
+                }
+                if((sn-200000000)%600000 == 0) {
+                    CrackList.updateListInDb(getApplicationContext(), net.BSSID, sn, net.getPossiblePasswordsAsString());
                 }
             }
-        makeNotification("Crack finished", "13 possible passwords found", 100, false);
+            makeNotification(i, "Crack finished", net.possiblePasswords.size() + " possible passwords found", 100, false);
+        }
     }
 
-    private void makeNotification(String contentTitle, String contentText, int progress, boolean onGoing) {
+    private void makeNotification(int notificationId, String contentTitle, String contentText, int progress, boolean onGoing) {
         // prepare intent which is triggered if the
         // notification is selected
         Intent intent = new Intent(this, CrackListActivity.class);
@@ -67,6 +76,6 @@ public class CrackService extends IntentService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
-        notificationManager.notify(0, n);
+        notificationManager.notify(notificationId, n);
     }
 }
