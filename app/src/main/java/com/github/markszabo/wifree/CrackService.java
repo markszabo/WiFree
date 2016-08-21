@@ -32,39 +32,41 @@ public class CrackService extends IntentService {
     }
 
     private void runCrack() {
-            // prepare intent which is triggered if the
-            // notification is selected
-
-            Intent intent = new Intent(this, CrackListActivity.class);
-            PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
-
-            // build notification
-            // the addAction re-use the same intent to keep the example short
-            Notification n  = new Notification.Builder(this)
-                    .setContentTitle("Crack started")
-                    .setContentText("for SSID")
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .setContentIntent(pIntent)
-                    .setAutoCancel(true).build();
-
-
-            NotificationManager notificationManager =
-                    (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
-            notificationManager.notify(0, n);
+        makeNotification("Crack started", "for SSID", 0, true);
 
             for(int i=0; i<1000000000; i++){
                 int a = i+1;
                 int b = a+i;
                 int c = b+a%123;
+                if(i%10000000 == 0) {
+                    makeNotification("Crack in progress", String.valueOf(i/10000000) + "%", i/10000000, true);
+                }
             }
+        makeNotification("Crack finished", "13 possible passwords found", 100, false);
+    }
 
-            n  = new Notification.Builder(this)
-                    .setContentTitle("Crack finished")
-                    .setContentText("13 possible password found")
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .setContentIntent(pIntent).build();
-            notificationManager.notify(0,n);
+    private void makeNotification(String contentTitle, String contentText, int progress, boolean onGoing) {
+        // prepare intent which is triggered if the
+        // notification is selected
+        Intent intent = new Intent(this, CrackListActivity.class);
+        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
+        // build notification
+        // the addAction re-use the same intent to keep the example short
+        Notification n  = new Notification.Builder(this)
+                .setOngoing(onGoing)
+                .setContentTitle(contentTitle)
+                .setContentText(contentText)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentIntent(pIntent)
+                .setAutoCancel(true)
+                .setProgress(100,progress,false)
+                .build();
+
+
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        notificationManager.notify(0, n);
     }
 }
