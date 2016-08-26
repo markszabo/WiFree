@@ -33,6 +33,12 @@
         android:text="Add test network to the list"
         android:id="@+id/addTestToCrackList" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Test"
+        android:id="@+id/test" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

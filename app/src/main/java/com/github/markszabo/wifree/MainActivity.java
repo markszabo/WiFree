@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         if(mDbHelper == null) {
-            mDbHelper = new CrackListDbHelper(getApplicationContext()); //create the database
+            mDbHelper = CrackListDbHelper.getInstance(getApplicationContext()); //create the database
             Toast.makeText(getApplicationContext(), "Database available", Toast.LENGTH_SHORT).show();
         }
 

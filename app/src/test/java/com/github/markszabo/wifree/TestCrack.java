@@ -4,6 +4,7 @@ package com.github.markszabo.wifree;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class TestCrack {
     @Test
@@ -22,6 +23,12 @@ public class TestCrack {
     public void test_Crack_3() throws Exception {
         Crack c = new Crack("538420", "e4:48:c7:88:7f:58");
         assertEquals("KEFWMZIT", c.getPSK(204455244));
+    }
+
+    @Test
+    public void test_Crack_4() throws Exception {
+        Crack c = new Crack("538420", "e4:48:c7:88:7f:58");
+        assertNull(c.getPSK(204455245));
     }
 
 }

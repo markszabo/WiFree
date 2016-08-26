@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -11,19 +12,11 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class CrackList {
-    private static CrackListDbHelper mDbHelper;
-    private static SQLiteDatabase dbReadable;
-    private static SQLiteDatabase dbWritable;
-
 
     public static WifiNetwork[] getListFromDb(Context context){
-        if(mDbHelper == null) {
-            mDbHelper = new CrackListDbHelper(context); //create the database
-        }
+        CrackListDbHelper mDbHelper = CrackListDbHelper.getInstance(context); //create the database
 
-        if(dbReadable == null) {
-            dbReadable = mDbHelper.getReadableDatabase();
-        }
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
         String[] projection = {
                 CrackListContract.FeedEntry._ID,
                 CrackListContract.FeedEntry.COLUMN_NAME_SSID,
@@ -33,7 +26,7 @@ public final class CrackList {
         };
         String sortOrder =
                 CrackListContract.FeedEntry._ID + " ASC";
-        Cursor c = dbReadable.query(
+        Cursor c = db.query(
                 CrackListContract.FeedEntry.TABLE_NAME,  // The table to query
                 projection,                               // The columns to return
                 null,                                // The columns for the WHERE clause
@@ -57,28 +50,24 @@ public final class CrackList {
     }
 
     public static void updateListInDb(Context context, String BSSID, int serialNumber, String possiblePasswords) {
-        if(mDbHelper == null) {
-            mDbHelper = new CrackListDbHelper(context);
-        }
-
-        if(dbWritable == null) {
-            dbWritable = mDbHelper.getWritableDatabase();
-        }
-        String sql = "UPDATE " + CrackListContract.FeedEntry.TABLE_NAME +
+        Log.e("","About to update db serialNumber=" + serialNumber + " and possiblepasswords=" + possiblePasswords);
+        CrackListDbHelper mDbHelper = CrackListDbHelper.getInstance(context);
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        /*String sql = "UPDATE " + CrackListContract.FeedEntry.TABLE_NAME +
                 " SET " + CrackListContract.FeedEntry.COLUMN_NAME_SERIAL_NUMBER + "=" + String.valueOf(serialNumber) + ", " +
                 CrackListContract.FeedEntry.COLUMN_NAME_POSSIBLE_PASSWORD + "=\"" + possiblePasswords +
                 "\" WHERE " + CrackListContract.FeedEntry.COLUMN_NAME_BSSID + "=\"" + BSSID + "\"";
-        Toast.makeText(context, sql, Toast.LENGTH_SHORT).show();
-        dbWritable.execSQL(sql);
+        db.execSQL(sql);*/
+        ContentValues cv = new ContentValues();
+        cv.put(CrackListContract.FeedEntry.COLUMN_NAME_SERIAL_NUMBER, String.valueOf(serialNumber));
+        cv.put(CrackListContract.FeedEntry.COLUMN_NAME_POSSIBLE_PASSWORD, possiblePasswords);
+        db.update(CrackListContract.FeedEntry.TABLE_NAME, cv, CrackListContract.FeedEntry.COLUMN_NAME_BSSID + "=\"" + BSSID + "\"", null);
+        db.close();
     }
 
     public static void addToListInDb(Context context, WifiNetwork network) {
-        if(mDbHelper == null) {
-            mDbHelper = new CrackListDbHelper(context);
-        }
-        if(dbWritable == null) {
-            dbWritable = mDbHelper.getWritableDatabase();
-        }
+        CrackListDbHelper mDbHelper = CrackListDbHelper.getInstance(context);
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
         //create new record
         ContentValues values = new ContentValues();
         values.put(CrackListContract.FeedEntry.COLUMN_NAME_SSID, network.SSID);
@@ -97,7 +86,7 @@ public final class CrackList {
         }
 
         //insert record
-        dbWritable.insert(
+        db.insert(
                 CrackListContract.FeedEntry.TABLE_NAME,
                 null, //no field can be null
                 values);

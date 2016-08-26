@@ -1,5 +1,7 @@
 package com.github.markszabo.wifree;
 
+import android.util.Log;
+
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -62,10 +64,10 @@ public class Crack {
 
     public String getPSK(int serial) {
         String[] SSID_PSK = genSSID_PSK(this.BSSID, serial);
-        //if(SSID_PSK[0] == this.SSID) {
+        if(this.SSID.equals(SSID_PSK[0])) {
             return SSID_PSK[1];
-        /*} else {
+        } else {
             return null;
-        }*/
+        }
     }
 }

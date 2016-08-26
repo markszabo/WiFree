@@ -5,6 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class CrackListDbHelper extends SQLiteOpenHelper {
+    private static CrackListDbHelper mInstance = null;
+
     private static final String TEXT_TYPE = " TEXT";
     private static final String INT_TYPE = " INTEGER";
     private static final String COMMA_SEP = ",";
@@ -24,7 +26,11 @@ public class CrackListDbHelper extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "CrackListActivity.db";
 
-    public CrackListDbHelper(Context context) {
+    /**
+     * Constructor should be private to prevent direct instantiation.
+     * make call to static factory method "getInstance()" instead.
+     */
+    private CrackListDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
     public void onCreate(SQLiteDatabase db) {
@@ -37,5 +43,15 @@ public class CrackListDbHelper extends SQLiteOpenHelper {
     }
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
+    }
+    // Use the application context, which will ensure that you
+    // don't accidentally leak an Activity's context.
+    // See this article for more information: http://bit.ly/6LRzfx
+    // Source: http://stackoverflow.com/a/18148718
+    public static CrackListDbHelper getInstance(Context ctx) {
+        if(mInstance == null) {
+            mInstance = new CrackListDbHelper(ctx.getApplicationContext());
+        }
+        return mInstance;
     }
 }
