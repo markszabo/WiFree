@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.Context;
+import android.os.PowerManager;
 
 public class CrackService extends IntentService {
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
@@ -32,11 +33,16 @@ public class CrackService extends IntentService {
     }
 
     private void runCrack() {
+        //get WakeLock to hold the CPU open and prevent sleep
+        PowerManager mgr = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+        PowerManager.WakeLock wakeLock = mgr.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock");
+        wakeLock.acquire();
+
         WifiNetwork[] networks = CrackList.getListFromDb(getApplicationContext());
         WifiNetwork net;
         for(int i=0; i<networks.length; i++) {
             net = networks[i];
-            makeNotification(i, "Crack started", "for UPC" + net.SSID, 0, true);
+            makeNotification(i, "Crack started", "for " + net.SSID, 0, true);
             Crack c = new Crack(net.SSID, net.BSSID);
             String PSK;
             int sn;
@@ -46,7 +52,7 @@ public class CrackService extends IntentService {
                     net.possiblePasswords.add(PSK);
                 }
                 if((sn-200000000)%6000 == 0) {
-                    makeNotification(i, "Crack in progress for UPC" + net.SSID, String.format("%d.%02d%%",(sn-200000000)/600000,(sn-200000000)/6000%100) , (sn-200000000)/600000, true);
+                    makeNotification(i, "Crack in progress for " + net.SSID, String.format("%d.%02d%%",(sn-200000000)/600000,(sn-200000000)/6000%100) , (sn-200000000)/600000, true);
                 }
                 if((sn-200000000)%60000 == 0) {
                     CrackList.updateListInDb(getApplicationContext(), net.BSSID, sn, net.getPossiblePasswordsAsString());
@@ -55,6 +61,8 @@ public class CrackService extends IntentService {
             CrackList.updateListInDb(getApplicationContext(), net.BSSID, sn, net.getPossiblePasswordsAsString()); //always save in the end
             makeNotification(i, "Crack finished", net.possiblePasswords.size() + " possible passwords found", 100, false);
         }
+        //when all crack finished, release wake lock
+        wakeLock.release();
     }
 
     private void makeNotification(int notificationId, String contentTitle, String contentText, int progress, boolean onGoing) {

@@ -46,6 +46,7 @@ public final class CrackList {
                             new ArrayList<String>(Arrays.asList(c.getString(c.getColumnIndexOrThrow(CrackListContract.FeedEntry.COLUMN_NAME_POSSIBLE_PASSWORD)).split(";"))));
             c.moveToNext();
         }
+        db.close();
         return ret;
     }
 
@@ -90,6 +91,6 @@ public final class CrackList {
                 CrackListContract.FeedEntry.TABLE_NAME,
                 null, //no field can be null
                 values);
-
+        db.close();
     }
 }
