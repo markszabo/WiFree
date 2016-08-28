@@ -11,8 +11,8 @@ public class Crack {
     private String SSID;
     private String BSSID;
 
-    public Crack(String SSID, String BSSID){
-        this.SSID = SSID;
+    public Crack(String SSID, String BSSID) {
+        this.SSID = SSID.substring(3); //trim the UPC part
         this.BSSID = BSSID.toLowerCase();
     }
 

@@ -39,20 +39,20 @@ public class CrackService extends IntentService {
             makeNotification(i, "Crack started", "for UPC" + net.SSID, 0, true);
             Crack c = new Crack(net.SSID, net.BSSID);
             String PSK;
-            for(int sn=net.serialNumber; sn < 260000000; sn++) { //serialnumber goes from 200.000.000 to 260.000.000 according to cisco_psk.py
+            int sn;
+            for(sn=net.serialNumber; sn <= 260000000; sn++) { //serialnumber goes from 200.000.000 to 260.000.000 according to cisco_psk.py
                 PSK = c.getPSK(sn);
                 if(PSK != null) {
                     net.possiblePasswords.add(PSK);
                 }
                 if((sn-200000000)%6000 == 0) {
-                    //TODO print the progress % better! (nicer code and also start with 0.01% and not 0.1% as now
-                    makeNotification(i, "Crack in progress for UPC" + net.SSID, (sn-200000000)/600000 + "." + (sn-200000000)/6000%100 + "%", (sn-200000000)/600000, true);
+                    makeNotification(i, "Crack in progress for UPC" + net.SSID, String.format("%d.%02d%%",(sn-200000000)/600000,(sn-200000000)/6000%100) , (sn-200000000)/600000, true);
                 }
                 if((sn-200000000)%60000 == 0) {
                     CrackList.updateListInDb(getApplicationContext(), net.BSSID, sn, net.getPossiblePasswordsAsString());
                 }
-                //if(sn > 200500000) { break; } //TODO this is here only for test!!!
             }
+            CrackList.updateListInDb(getApplicationContext(), net.BSSID, sn, net.getPossiblePasswordsAsString()); //always save in the end
             makeNotification(i, "Crack finished", net.possiblePasswords.size() + " possible passwords found", 100, false);
         }
     }

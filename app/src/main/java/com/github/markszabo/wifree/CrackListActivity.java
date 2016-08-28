@@ -45,7 +45,7 @@ public class CrackListActivity extends AppCompatActivity {
         addTestNetwork.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CrackList.addToListInDb(getApplicationContext(), new WifiNetwork("538420", "e4:48:c7:88:7f:58"));
+                CrackList.addToListInDb(getApplicationContext(), new WifiNetwork("UPC538420", "e4:48:c7:88:7f:58"));
                 //reload the activity to clear the list
                 finish();
                 startActivity(getIntent());
@@ -56,7 +56,8 @@ public class CrackListActivity extends AppCompatActivity {
         testBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CrackList.updateListInDb(getApplicationContext(), "e4:48:c7:88:7f:58", 200000000, "testpass1;testpass2;");
+                //CrackList.updateListInDb(getApplicationContext(), "e4:48:c7:88:7f:58", 200000000, "testpass1;testpass2;");
+                //do some testing here
                 //reload the activity to clear the list
                 finish();
                 startActivity(getIntent());

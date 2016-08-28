@@ -80,7 +80,7 @@ public final class CrackList {
         }
 
         if(network.possiblePasswords == null) {
-            values.put(CrackListContract.FeedEntry.COLUMN_NAME_POSSIBLE_PASSWORD, "nulladik;elso;masodik");
+            values.put(CrackListContract.FeedEntry.COLUMN_NAME_POSSIBLE_PASSWORD, "");
         } else {
             values.put(CrackListContract.FeedEntry.COLUMN_NAME_POSSIBLE_PASSWORD, network.getPossiblePasswordsAsString());
         }
