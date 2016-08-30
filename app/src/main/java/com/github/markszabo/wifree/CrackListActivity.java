@@ -56,8 +56,13 @@ public class CrackListActivity extends AppCompatActivity {
         testBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //CrackList.updateListInDb(getApplicationContext(), "e4:48:c7:88:7f:58", 200000000, "testpass1;testpass2;");
                 //do some testing here
+                ConnectToWifi con = new ConnectToWifi(getApplicationContext(), "UPC695958");
+                con.addPsk("12345678");
+                con.addPsk("asdfertz");
+                con.addPsk("REALPASS");
+                con.addPsk("ASDGFHKJG");
+                con.start();
                 //reload the activity to clear the list
                 finish();
                 startActivity(getIntent());
