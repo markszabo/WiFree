@@ -23,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
     private WifiManager mWifiManager;
     private boolean WifiScanReceiverRegistered = false;
 
-    private ArrayList<WifiNetwork> arrayOfNetworks;
     private WifiNetworkAdapter adapter;
     private CrackListDbHelper mDbHelper;
 
@@ -68,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Construct the data source
-        arrayOfNetworks = new ArrayList<WifiNetwork>();
+        ArrayList<WifiNetwork> arrayOfNetworks = new ArrayList<>();
         // Create the adapter to convert the array to views
         adapter = new WifiNetworkAdapter(this, arrayOfNetworks);
         // Attach the adapter to a ListView

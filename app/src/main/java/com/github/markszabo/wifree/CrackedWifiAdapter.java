@@ -1,6 +1,5 @@
 package com.github.markszabo.wifree;
 
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,8 +9,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class WifiNetworkAdapter extends ArrayAdapter<WifiNetwork> {
-    public WifiNetworkAdapter(Context context, ArrayList<WifiNetwork> networks) {
+
+public class CrackedWifiAdapter extends ArrayAdapter<WifiNetwork> {
+    public CrackedWifiAdapter(Context context, ArrayList<WifiNetwork> networks) {
         super(context, 0, networks);
     }
 
@@ -21,18 +21,20 @@ public class WifiNetworkAdapter extends ArrayAdapter<WifiNetwork> {
         WifiNetwork network = getItem(position);
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_wifinetwork, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_crackedwifi, parent, false);
         }
         // Lookup view for data population
         TextView tvSSID = (TextView) convertView.findViewById(R.id.tvSSID);
-        TextView tvBSSID = (TextView) convertView.findViewById(R.id.tvBSSID);
-        TextView tvIsVulnerable = (TextView) convertView.findViewById(R.id.tvIsVulnerable);
+        TextView tvStatus = (TextView) convertView.findViewById(R.id.tvStatus);
+        TextView tvPassword = (TextView) convertView.findViewById(R.id.tvPassword);
         // Populate the data into the template view using the data object
         tvSSID.setText(network.SSID);
-        tvBSSID.setText(network.BSSID);
-        tvIsVulnerable.setText(network.getVulnerabilityMessage());
-
+        tvStatus.setText(network.getStatus());
+        if(network.serialNumber == WifiNetwork.CRACK_FINISHED) {
+            tvPassword.setText(network.possiblePasswords.get(0));
+        }
         // Return the completed view to render on screen
         return convertView;
     }
 }
+

